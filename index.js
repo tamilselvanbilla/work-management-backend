@@ -40,6 +40,7 @@ app.use(bodyParser.json({ limit: "50mb" }));
 
 // Authentication Paths
 require("./src/routes/auth.route")(app);
+require("./src/routes/work.route")(app);
 
 // Public media access
 app.use(express.static(__dirname + '/view/interview/'));

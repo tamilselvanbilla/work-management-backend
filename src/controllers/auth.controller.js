@@ -12,21 +12,17 @@ exports.createApplication = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
     try {
-        var output = await modal.find(filter, query.select);
-        successRes(res, output, "List generated successfully!");
+        var output = await authModel.find({ emailId: req.body.emailId, password: req.body.password });
+        if (!output) {
+            throw "User not found"
+        }
+        // Token generation functuin also can do here {}
+        successRes(res, output, "Login successfully!");
     } catch (error) {
-        errorRes(res, error, "List generation failure!", controller);
+        errorRes(res, error, "Login failure!", controller);
     }
 }
 
-// Update query pass the match objects into the filter object, updated data to the update object
-exports.forgotPassword = async (req, res) => {
-    var query = {}
-    query.filter = { emailId: req.body.emailId };
-    query.update = req.body;
-    query.options = { new: true };
-    reuseApi.findAndUpdate(req, res, authModel, query, controller);
-}
 
 // Update query pass the match objects into the filter object, updated data to the update object
 exports.sendOTP = async (req, res) => {
@@ -34,14 +30,15 @@ exports.sendOTP = async (req, res) => {
     query.filter = { emailId: req.body.emailId };
     query.update = { otp: otpGenerator() };
     query.options = { new: true };
+    // Call funciton here to send otp via sms or email {}
     reuseApi.findAndUpdate(req, res, authModel, query, controller);
 }
 
 // Update query pass the match objects into the filter object, updated data to the update object
 exports.OTPverify = async (req, res) => {
     var query = {}
-    query.filter = { _id: req.params.id };
-    query.update = req.body;
+    query.filter = { emailId: req.body.emailId, otp: req.body.otp };
+    query.update = { otp: null };
     query.options = { new: true };
     reuseApi.findAndUpdate(req, res, authModel, query, controller);
 }
